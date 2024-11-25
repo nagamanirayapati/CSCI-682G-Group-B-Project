@@ -1,6 +1,10 @@
 const express = require('express');
+import protectRoute from "../middleware/protectRoute.js";
+import { getUsersForSidebar } from "../controllers/userController.js";
+
 const router = express.Router();
 const User = require('../models/user');
+
 
 // Signup Route
 router.post('/signup', async (req, res) => {
@@ -19,5 +23,8 @@ router.post('/signup', async (req, res) => {
       res.status(500).json({ error: 'User creation failed' });
     }
 });
+
+
+router.get("/", protectRoute, getUsersForSidebar);
 
 module.exports = router;
