@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import { Link,useNavigate } from 'react-router-dom'; 
 import io from 'socket.io-client';
 import axios from 'axios';
 import './Signin-up.css';
 
-const socket = io.connect('http://localhost:5000');
+const socket = io.connect(process.env.REACT_APP_SOCKET_URL);
 
 const Signup = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
   const [usernameAvailable, setUsernameAvailable] = useState(null);
+  const navigate = useNavigate();
+  const [error,setError] = useState(""); 
 
   useEffect(() => {
     socket.on('usernameChecked', (data) => {
@@ -26,29 +30,35 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Username:', username); // Log username
-  console.log('Password:', password);
     try {
-      const response = await axios.post('http://localhost:5000/api/users/signup', {
+      const apiEndpoint = `${socket.io.uri}/api/users/signup`;
+      const response = await axios.post(apiEndpoint, {
         username,
         password,
+        email,
       });
       alert(response.data.message);
+      navigate('/signin');
     } catch (error) {
-      const message = error.response?.data?.message || error.message || 'Signup failed due to unknown error';
-      console.error('Signup failed:', message);
-      alert(`Signup failed: ${message}`);
+      const backendError = error.response?.data?.error || 'Signup failed due to unknown error';
+      console.log(error);
+      setError(backendError);
     }
   };
 
   return (
     <div className="signup-container">
-      <h2>Signup</h2>
+      <div className="signup-card">
       <form onSubmit={handleSubmit}>
-        <div>
-          <label>Username:</label>
+      <h2 className="signup-title"> Register </h2>
+      <p className="line"></p>
+          <div className="error-message"><p>{error}</p></div>
+          <div className="signup-fields">
+          <label htmlFor="username"> {" "} <b>Username</b></label>
           <input
+          className="signup-textbox"
             type="text"
+            placeholder="Enter Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             onBlur={checkUsername}
@@ -58,17 +68,32 @@ const Signup = () => {
               {usernameAvailable ? 'Username available' : 'Username taken'}
             </span>
           )}
-        </div>
-        <div>
-          <label>Password:</label>
+        <label htmlFor="password"> <b>Password</b></label>
           <input
+          className="signup-textbox"
             type="password"
+            placeholder="Enter Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+          <label htmlFor="email">{" "}<b>Email</b></label>
+          <input
+          className="signup-textbox"
+          placeholder="Enter Email" 
+            type="email"  // Use email input type
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required  // Make email field required
+          />
         </div>
-        <button type="submit">Signup</button>
+        <button className="signup-button" type="submit">Signup</button>
       </form>
+      <div className="signup-option">
+          <p className="signup-question">
+            Have an account? <Link to="/signin">Sign In</Link>
+          </p>
+        </div>
+    </div>
     </div>
   );
 };
