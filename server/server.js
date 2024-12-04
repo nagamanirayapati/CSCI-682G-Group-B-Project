@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const http = require('http');
 const mongoose = require('mongoose');
@@ -10,7 +11,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:3000',
+    origin: process.env.CORS_ORIGIN,
     methods: ['GET', 'POST'],
     allowedHeaders: ['my-custom-header'],
     credentials: true,
@@ -24,7 +25,7 @@ app.use('/api/users', userRoutes);
 
 // MongoDB connection
 mongoose
-  .connect('mongodb://127.0.0.1:27017/chatapp', {
+  .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -49,5 +50,5 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => console.log('Client disconnected'));
 });
-
-server.listen(5000, () => console.log('Server running on port 5000'));
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => console.log('Server running on port ${PORT}'));
