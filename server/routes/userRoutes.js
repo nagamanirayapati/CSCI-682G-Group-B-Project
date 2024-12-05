@@ -1,7 +1,10 @@
-const express = require('express');
+import express from "express";
+import protectRoute from "../middleware/protectRoute.js";
+import { getUsersForSidebar } from "../controllers/userController.js";
+import bcrypt from "bcryptjs";
+
 const router = express.Router();
-const bcrypt = require('bcryptjs');
-const User = require('../models/user');
+import User from "../models/user.js";
 
 // Signup Route
 router.post('/signup', async (req, res) => {
@@ -23,6 +26,8 @@ router.post('/signup', async (req, res) => {
     if (error.code === 11000) { // Duplicate key error code
         return res.status(400).json({ error: 'Username already exists' });
       }
+
+      console.log(error);
       
       // Generic error response for other issues
       res.status(500).json({ error: 'User creation failed' });
@@ -53,4 +58,6 @@ router.post('/signin', async (req, res) => {
   }
 });
 
-module.exports = router;
+router.get("/", /*protectRoute,*/ getUsersForSidebar);
+
+export default router;
