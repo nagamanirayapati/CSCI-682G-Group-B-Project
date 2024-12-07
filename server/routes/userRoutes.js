@@ -1,7 +1,11 @@
 const express = require('express');
+import protectRoute from "../middleware/protectRoute.js";
+import { getUsersForSidebar } from "../controllers/userController.js";
+
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
+
 
 // Signup Route
 router.post('/signup', async (req, res) => {
@@ -52,5 +56,8 @@ router.post('/signin', async (req, res) => {
     res.status(500).json({ error: 'Sign-In failed' });
   }
 });
+
+
+router.get("/", protectRoute, getUsersForSidebar);
 
 module.exports = router;
