@@ -4,7 +4,7 @@ import io from 'socket.io-client';
 import axios from 'axios';
 import './Signin-up.css';
 
-const socket = io.connect(process.env.REACT_APP_SOCKET_URL);
+const socket = io.connect("http://localhost:5000");
 
 const Signup = () => {
   const [username, setUsername] = useState('');
@@ -31,7 +31,7 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const apiEndpoint = `${socket.io.uri}/api/users/signup`;
+      const apiEndpoint = `http://localhost:5000/api/users/signup`;
       const response = await axios.post(apiEndpoint, {
         username,
         password,
